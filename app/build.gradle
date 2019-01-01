@@ -47,4 +47,5 @@ dependencies {
     implementation "org.androidannotations:androidannotations-api:4.4.0"
 
     compileOnly 'javax.annotation:jsr250-api:1.0'
+    implementation 'com.android.support:design:27.1.1'
 }
