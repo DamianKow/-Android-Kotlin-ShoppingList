@@ -4,7 +4,9 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
-//apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-kapt'
+
+apply plugin: "kotlin-allopen"
 
 android {
     compileSdkVersion 27
@@ -15,6 +17,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -22,9 +25,18 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-//    kapt {
-//        generateStubs = true
-//    }
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+}
+
+kapt {
+    correctErrorTypes = true
+}
+
+allOpen {
+    annotation("org.androidannotations.api.KotlinOpen")
 }
 
 
@@ -43,8 +55,9 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
     //Android annotations
-    annotationProcessor "org.androidannotations:androidannotations:4.4.0"
-    implementation "org.androidannotations:androidannotations-api:4.4.0"
+    annotationProcessor "org.androidannotations:androidannotations:4.5.0"
+    implementation "org.androidannotations:androidannotations-api:4.5.0"
+    kapt "org.androidannotations:androidannotations:4.5.0"
 
     compileOnly 'javax.annotation:jsr250-api:1.0'
     implementation 'com.android.support:design:27.1.1'
