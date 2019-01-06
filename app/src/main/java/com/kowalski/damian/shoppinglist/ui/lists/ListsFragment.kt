@@ -2,6 +2,7 @@ package com.kowalski.damian.shoppinglist.ui.lists
 
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
+import android.widget.Toast
 import com.kowalski.damian.shoppinglist.R
 import com.kowalski.damian.shoppinglist.model.ListDB
 import kotlinx.android.synthetic.main.fragment_lists.*
@@ -17,6 +18,7 @@ class ListsFragment: Fragment(), ListsContract.View {
     lateinit var presenter: ListsContract.Presenter
 
     private lateinit var adapter: ListsAdapter
+
     private var tmpList: List<ListDB> = listOf(ListDB(1, "Auchan"), ListDB(2, "test"))
 
     @AfterInject
@@ -31,12 +33,17 @@ class ListsFragment: Fragment(), ListsContract.View {
     }
 
     private fun setupRecyclerView() {
-        this.adapter = ListsAdapter { list -> onListClicked(list) }
+        this.adapter = ListsAdapter({ list -> onListClicked(list) }, { list -> onListDeleted(list) })
         lists_recycler.adapter = this.adapter
         lists_recycler.layoutManager = LinearLayoutManager(context)
     }
 
     private fun onListClicked(list: ListDB) {
         //not implemented yet
+        Toast.makeText(context, list.id.toString(), Toast.LENGTH_SHORT).show() //TODO: efekt clickable
+    }
+
+    private fun onListDeleted(list: ListDB) {
+        Toast.makeText(context, "Usuwam ".plus(list.id.toString()), Toast.LENGTH_SHORT).show()
     }
 }
