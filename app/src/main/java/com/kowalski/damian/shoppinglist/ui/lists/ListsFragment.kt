@@ -1,29 +1,40 @@
 package com.kowalski.damian.shoppinglist.ui.lists
 
+import android.app.AlertDialog
 import android.app.Dialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import com.kowalski.damian.shoppinglist.R
 import com.kowalski.damian.shoppinglist.db.entities.ListEntity
 import com.kowalski.damian.shoppinglist.db.viewmodel.ListViewModel
+import com.kowalski.damian.shoppinglist.utils.GuiUtils
 import kotlinx.android.synthetic.main.fragment_lists.*
 import org.androidannotations.annotations.*
 
 
 @EFragment(R.layout.fragment_lists)
-class ListsFragment: Fragment(), ListsContract.View {
+@OptionsMenu(R.menu.list_fragment_menu)
+class ListsFragment : Fragment(), ListsContract.View {
+
+    private lateinit var adapter: ListsAdapter
+    private lateinit var listViewModel: ListViewModel
+
+    var deleteAllMenuItem: MenuItem? = null
 
     @Bean(ListsPresenter::class)
     lateinit var presenter: ListsContract.Presenter
 
-    private lateinit var adapter: ListsAdapter
-
-    private lateinit var listViewModel: ListViewModel
+    @Bean
+    lateinit var guiUtils: GuiUtils
 
     @AfterInject
     fun afterInject() {
@@ -34,15 +45,62 @@ class ListsFragment: Fragment(), ListsContract.View {
     fun afterViews() {
         setupRecyclerView()
         listViewModel = ViewModelProviders.of(this).get(ListViewModel::class.java)
-        listViewModel.getAllLists().observe(this, Observer<List<ListEntity>> { list ->
-            adapter.updateDataSet(list!!)
-        })
+        progressbar_list.visibility = View.VISIBLE
+        empty_list_layout.visibility = View.GONE
+        lists_recycler.visibility = View.GONE
+
     }
 
     @Click(R.id.add_new_list)
     fun createConfirmationDialog() {
-        var dialog = createDialog()
+        val dialog = createDialog()
         dialog.show()
+    }
+
+    @OptionsItem(R.id.delete_all_action)
+    fun deleteAllList() {
+        val builder = AlertDialog.Builder(context) //TODO zamienić na guiUtils
+        builder.setTitle("Usuwanie")
+        builder.setMessage("Czy napewno chcesz usunąć wszystkie listy zakupów?")
+        builder.setPositiveButton(context?.getString(R.string.yes)) { dialog, which ->
+            deleteAll()
+            dialog.dismiss()
+        }
+        builder.setNegativeButton(context?.getString(R.string.no)) { dialog, which ->
+            dialog.dismiss()
+        }
+        val dialog = builder.create()
+        dialog.show()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        deleteAllMenuItem = menu!!.findItem(R.id.delete_all_action)
+        listViewModel.getAllLists().observe(this, Observer<List<ListEntity>> { list ->
+            adapter.updateDataSet(list!!)
+            checkIfEmptyList(list)
+        })
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    private fun deleteAll() {
+        listViewModel.deleteAll()
+    }
+
+    fun addNewList(listName: String) {
+        listViewModel.insert(ListEntity(0, listName))
+    }
+
+    private fun checkIfEmptyList(list: List<ListEntity>?) {
+        progressbar_list.visibility = View.GONE
+        if (list != null && !list.isEmpty()) {
+            empty_list_layout.visibility = View.GONE
+            lists_recycler.visibility = View.VISIBLE
+            deleteAllMenuItem?.isVisible = true
+        } else {
+            empty_list_layout.visibility = View.VISIBLE
+            lists_recycler.visibility = View.GONE
+            deleteAllMenuItem?.isVisible = false
+        }
     }
 
     private fun setupRecyclerView() {
@@ -57,11 +115,22 @@ class ListsFragment: Fragment(), ListsContract.View {
     }
 
     private fun onListDeleted(list: ListEntity) {
-        listViewModel.deleteById(list.id)
+        val builder = AlertDialog.Builder(context) //TODO zamienić na guiUtils
+        builder.setTitle("Usuwanie")
+        builder.setMessage("Czy napewno chcesz usunąć liste zakupów?")
+        builder.setPositiveButton(context?.getString(R.string.yes)) { dialog, which ->
+            deleteList(list.id)
+            dialog.dismiss()
+        }
+        builder.setNegativeButton(context?.getString(R.string.no)) { dialog, which ->
+            dialog.dismiss()
+        }
+        val dialog = builder.create()
+        dialog.show()
     }
 
-    fun addNewList(listName: String) {
-        listViewModel.insert(ListEntity(0, listName))
+    private fun deleteList(id: Long) {
+        listViewModel.deleteById(id)
     }
 
     private fun createDialog(): Dialog {

@@ -4,4 +4,7 @@
     <string name="add_list">Dodaj listę</string>
     <string name="list_name">Nazwa listy</string>
     <string name="add">Dodaj</string>
+    <string name="wait_label">Proszę czekać</string>
+    <string name="yes">Tak</string>
+    <string name="no">Anuluj</string>
 </resources>

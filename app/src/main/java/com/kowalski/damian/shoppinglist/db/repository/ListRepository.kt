@@ -27,7 +27,11 @@ class ListRepository(application: Application) {
     }
 
     fun deleteById(id: Long) {
-        DeleteAsyncTask(listDao).execute(id)
+        DeleteAsyncTask(listDao, false).execute(id)
+    }
+
+    fun deleteAll() {
+        DeleteAsyncTask(listDao, true).execute()
     }
 
     inner class InsertAsyncTask(var listDao: ListDao) : AsyncTask<ListEntity, Void?, Void?>() {
@@ -37,9 +41,13 @@ class ListRepository(application: Application) {
         }
     }
 
-    inner class DeleteAsyncTask(var listDao: ListDao) : AsyncTask<Long, Void?, Void?>() {
+    inner class DeleteAsyncTask(var listDao: ListDao, var deleteAll: Boolean) : AsyncTask<Long, Void?, Void?>() {
         override fun doInBackground(vararg params: Long?): Void? {
-            listDao.deleteListById(params[0])
+            if (!deleteAll) {
+                listDao.deleteListById(params[0])
+            } else {
+                listDao.deleteAll()
+            }
             return null
         }
     }

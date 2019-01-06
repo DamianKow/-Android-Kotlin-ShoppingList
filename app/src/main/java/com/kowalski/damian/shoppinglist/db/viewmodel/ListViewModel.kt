@@ -26,4 +26,8 @@ class ListViewModel(application: Application) : AndroidViewModel(application) {
     fun deleteById(id: Long) {
         listRepository.deleteById(id)
     }
+
+    fun deleteAll() {
+        listRepository.deleteAll()
+    }
 }
