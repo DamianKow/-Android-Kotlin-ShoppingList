@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">ShoppingList</string>
     <string name="content_desc_delete">delete</string>
+    <string name="add_list">Dodaj listę</string>
+    <string name="list_name">Nazwa listy</string>
+    <string name="add">Dodaj</string>
 </resources>

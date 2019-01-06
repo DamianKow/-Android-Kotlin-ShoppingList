@@ -8,12 +8,12 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.kowalski.damian.shoppinglist.R
-import com.kowalski.damian.shoppinglist.model.ListDB
+import com.kowalski.damian.shoppinglist.db.entities.ListEntity
 
-class ListsAdapter(private val listener: (ListDB) -> Unit, private val deleteListener: (ListDB) -> Unit) :
+class ListsAdapter(private val listener: (ListEntity) -> Unit, private val deleteListener: (ListEntity) -> Unit) :
     RecyclerView.Adapter<ListsAdapter.ListsViewHolder>() {
 
-    private val items = mutableListOf<ListDB>()
+    private val items = mutableListOf<ListEntity>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListsViewHolder {
         val view = LayoutInflater.from(parent?.context).inflate(R.layout.single_item_list, parent, false)
@@ -25,13 +25,14 @@ class ListsAdapter(private val listener: (ListDB) -> Unit, private val deleteLis
     override fun onBindViewHolder(holder: ListsViewHolder, position: Int) {
         if (itemCount > position) {
             val listDB = items[position]
-            holder.bindData(listDB.name)
+            holder.bindData(listDB.listName)
             holder.deleteImageView.setOnClickListener { deleteListener.invoke(listDB) }
             holder.listItem.setOnClickListener { listener.invoke(listDB) }
         }
     }
 
-    fun updateDataSet(newItems: List<ListDB>) {
+    fun updateDataSet(newItems: List<ListEntity>) {
+//        newItems.forEach{item -> Log.e("tutaj", item.id.toString())}
         items.clear()
         items.addAll(newItems)
         notifyDataSetChanged()
