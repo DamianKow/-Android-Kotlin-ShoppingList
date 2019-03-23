@@ -4,13 +4,7 @@ import com.kowalski.damian.shoppinglist.ui.BaseContract
 
 interface ListsContract {
 
-    interface View : BaseContract.BaseView{
+    interface View : BaseContract.BaseView
 
-
-    }
-
-    interface Presenter : BaseContract.BasePresenter<ListsContract.View> {
-
-        fun getListsFromDb() : Array<Int>
-    }
+    interface Presenter : BaseContract.BasePresenter<ListsContract.View>
 }
